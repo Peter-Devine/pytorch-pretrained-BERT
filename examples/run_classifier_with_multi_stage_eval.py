@@ -587,11 +587,11 @@ def compute_metrics(task_name, preds, labels):
     else:
         raise KeyError(task_name)
 
-def dev_and_training_evaluation(processor, args, label_list, tokenizer, output_mode, device, global_step):
-    dataset_evaluation("train", processor, args, label_list, tokenizer, output_mode, device, global_step)
-    dataset_evaluation("dev", processor, args, label_list, tokenizer, output_mode, device, global_step)
+def dev_and_training_evaluation(processor, args, label_list, tokenizer, output_mode, device, global_step, model):
+    dataset_evaluation("train", processor, args, label_list, tokenizer, output_mode, device, global_step, model)
+    dataset_evaluation("dev", processor, args, label_list, tokenizer, output_mode, device, global_step, model)
 
-def dataset_evaluation(eval_type, processor, args, label_list, tokenizer, output_mode, device, global_step):
+def dataset_evaluation(eval_type, processor, args, label_list, tokenizer, output_mode, device, global_step, model):
     if eval_type == "train":
         eval_examples = processor.get_train_examples(args.data_dir)
     else:
@@ -970,7 +970,7 @@ def main():
                     global_step += 1
             
             #### EVERY STAGE EVAL #####
-            dev_and_training_evaluation(processor, args, label_list, tokenizer, output_mode, device, global_step)
+            dev_and_training_evaluation(processor, args, label_list, tokenizer, output_mode, device, global_step, model)
             #### EVERY STAGE EVAL END #####
 
     if args.do_train and (args.local_rank == -1 or torch.distributed.get_rank() == 0):
