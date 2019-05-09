@@ -972,7 +972,7 @@ def main():
                     global_step += 1
             
             #### EVERY STAGE EVAL #####
-            dev_and_training_evaluation(processor, args, label_list, tokenizer, output_mode, device, global_step, model, num_labels, task_name)
+            dev_and_training_evaluation(processor, args, label_list, tokenizer, output_mode, device, global_step, model, num_labels, task_name, tr_loss)
             #### EVERY STAGE EVAL END #####
 
     if args.do_train and (args.local_rank == -1 or torch.distributed.get_rank() == 0):
