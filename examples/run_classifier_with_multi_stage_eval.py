@@ -661,7 +661,13 @@ def dataset_evaluation(eval_type, processor, args, label_list, tokenizer, output
     result['loss'] = loss
 
     output_eval_file = os.path.join(args.output_dir, eval_type + "_eval_results.txt")
-    with open(output_eval_file, "w") as writer:
+    
+    if os.path.exists(output_eval_file):
+        append_write = 'a' # append if already exists
+    else:
+        append_write = 'w' # make a new file if not
+    
+    with open(output_eval_file, append_write) as writer:
         logger.info("***** Eval results *****")
         print()
         for key in sorted(result.keys()):
