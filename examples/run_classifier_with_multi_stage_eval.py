@@ -427,6 +427,33 @@ class DailyDialogueProcessor(DataProcessor):
             examples.append(
                 InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
         return examples
+    
+    
+class EmotionLinesProcessor(DataProcessor):
+
+    def get_train_examples(self, data_dir):
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "train.tsv")), "train")
+
+    def get_dev_examples(self, data_dir):
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "dev.tsv")), "dev")
+
+    def get_labels(self):
+        return ['neutral', 'surprise', 'fear', 'non-neutral', 'joy', 'sadness', 'anger', 'disgust']
+
+    def _create_examples(self, lines, set_type):
+        examples = []
+        for (i, line) in enumerate(lines):
+            if i == 0:
+                continue
+            guid = "%s-%s" % (set_type, i)
+            text_a = line[4]
+            text_b = line[7]
+            label = line[2]
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+        return examples
 
     
 def convert_examples_to_features(examples, label_list, max_seq_length,
@@ -585,6 +612,8 @@ def compute_metrics(task_name, preds, labels):
     elif task_name == "wnli":
         return {"acc": simple_accuracy(preds, labels)}
     elif task_name == "dailydialogue":
+        return {"acc": simple_accuracy(preds, labels)}
+    elif task_name == "emotionlines":
         return {"acc": simple_accuracy(preds, labels)}
     else:
         raise KeyError(task_name)
@@ -785,6 +814,7 @@ def main():
         "rte": RteProcessor,
         "wnli": WnliProcessor,
         "dailydialogue": DailyDialogueProcessor,
+        "emotionlines": EmotionLinesProcessor,
     }
 
     output_modes = {
@@ -798,6 +828,7 @@ def main():
         "rte": "classification",
         "wnli": "classification",
         "dailydialogue": "classification",
+        "emotionlines": "classification",
     }
 
     if args.local_rank == -1 or args.no_cuda:
