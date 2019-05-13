@@ -670,6 +670,222 @@ class FBVAAProcessor(DataProcessor):
             examples.append(
                 InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
         return examples
+    
+    
+class SSECAngerProcessor(DataProcessor):
+
+    def get_train_examples(self, data_dir):
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "train.tsv")), "train")
+
+    def get_dev_examples(self, data_dir):
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "dev.tsv")), "dev")
+
+    def get_labels(self):
+        return ["1", "0"]
+
+    def _create_examples(self, lines, set_type):
+        examples = []
+        for (i, line) in enumerate(lines):
+            if i == 0:
+                continue
+            guid = "%s-%s" % (set_type, i)
+            text_a = line[9]
+            text_b = None
+            label = line[10]
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+        return examples
+    
+    
+class SSECAnticipationProcessor(DataProcessor):
+
+    def get_train_examples(self, data_dir):
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "train.tsv")), "train")
+
+    def get_dev_examples(self, data_dir):
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "dev.tsv")), "dev")
+
+    def get_labels(self):
+        return ["1", "0"]
+
+    def _create_examples(self, lines, set_type):
+        examples = []
+        for (i, line) in enumerate(lines):
+            if i == 0:
+                continue
+            guid = "%s-%s" % (set_type, i)
+            text_a = line[9]
+            text_b = None
+            label = line[11]
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+        return examples
+    
+    
+class SSECDisgustProcessor(DataProcessor):
+
+    def get_train_examples(self, data_dir):
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "train.tsv")), "train")
+
+    def get_dev_examples(self, data_dir):
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "dev.tsv")), "dev")
+
+    def get_labels(self):
+        return ["1", "0"]
+
+    def _create_examples(self, lines, set_type):
+        examples = []
+        for (i, line) in enumerate(lines):
+            if i == 0:
+                continue
+            guid = "%s-%s" % (set_type, i)
+            text_a = line[9]
+            text_b = None
+            label = line[12]
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+        return examples
+    
+    
+class SSECFearProcessor(DataProcessor):
+
+    def get_train_examples(self, data_dir):
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "train.tsv")), "train")
+
+    def get_dev_examples(self, data_dir):
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "dev.tsv")), "dev")
+
+    def get_labels(self):
+        return ["1", "0"]
+
+    def _create_examples(self, lines, set_type):
+        examples = []
+        for (i, line) in enumerate(lines):
+            if i == 0:
+                continue
+            guid = "%s-%s" % (set_type, i)
+            text_a = line[9]
+            text_b = None
+            label = line[13]
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+        return examples
+    
+    
+class SSECJoyProcessor(DataProcessor):
+
+    def get_train_examples(self, data_dir):
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "train.tsv")), "train")
+
+    def get_dev_examples(self, data_dir):
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "dev.tsv")), "dev")
+
+    def get_labels(self):
+        return ["1", "0"]
+
+    def _create_examples(self, lines, set_type):
+        examples = []
+        for (i, line) in enumerate(lines):
+            if i == 0:
+                continue
+            guid = "%s-%s" % (set_type, i)
+            text_a = line[9]
+            text_b = None
+            label = line[14]
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+        return examples
+    
+    
+class SSECSadnessProcessor(DataProcessor):
+
+    def get_train_examples(self, data_dir):
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "train.tsv")), "train")
+
+    def get_dev_examples(self, data_dir):
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "dev.tsv")), "dev")
+
+    def get_labels(self):
+        return ["1", "0"]
+
+    def _create_examples(self, lines, set_type):
+        examples = []
+        for (i, line) in enumerate(lines):
+            if i == 0:
+                continue
+            guid = "%s-%s" % (set_type, i)
+            text_a = line[9]
+            text_b = None
+            label = line[15]
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+        return examples
+    
+    
+class SSECSurpriseProcessor(DataProcessor):
+
+    def get_train_examples(self, data_dir):
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "train.tsv")), "train")
+
+    def get_dev_examples(self, data_dir):
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "dev.tsv")), "dev")
+
+    def get_labels(self):
+        return ["1", "0"]
+
+    def _create_examples(self, lines, set_type):
+        examples = []
+        for (i, line) in enumerate(lines):
+            if i == 0:
+                continue
+            guid = "%s-%s" % (set_type, i)
+            text_a = line[9]
+            text_b = None
+            label = line[16]
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+        return examples
+    
+    
+class SSECTrustProcessor(DataProcessor):
+
+    def get_train_examples(self, data_dir):
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "train.tsv")), "train")
+
+    def get_dev_examples(self, data_dir):
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "dev.tsv")), "dev")
+
+    def get_labels(self):
+        return ["1", "0"]
+
+    def _create_examples(self, lines, set_type):
+        examples = []
+        for (i, line) in enumerate(lines):
+            if i == 0:
+                continue
+            guid = "%s-%s" % (set_type, i)
+            text_a = line[9]
+            text_b = None
+            label = line[17]
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+        return examples
 
     
 def convert_examples_to_features(examples, label_list, max_seq_length,
@@ -847,9 +1063,26 @@ def compute_metrics(task_name, preds, labels):
         return {"acc": simple_accuracy(preds, labels)}
     elif task_name == "fbvav":
         return {"acc": simple_accuracy(preds, labels)}
+    elif task_name == "ssecanger":
+        return {"acc": simple_accuracy(preds, labels)}
+    elif task_name == "ssecanticipation":
+        return {"acc": simple_accuracy(preds, labels)}
+    elif task_name == "ssecdisgust":
+        return {"acc": simple_accuracy(preds, labels)}
+    elif task_name == "ssecfear":
+        return {"acc": simple_accuracy(preds, labels)}
+    elif task_name == "ssecjoy":
+        return {"acc": simple_accuracy(preds, labels)}
+    elif task_name == "ssecsadness":
+        return {"acc": simple_accuracy(preds, labels)}
+    elif task_name == "ssecsurprise":
+        return {"acc": simple_accuracy(preds, labels)}
+    elif task_name == "ssectrust":
+        return {"acc": simple_accuracy(preds, labels)}
     else:
         raise KeyError(task_name)
-
+        
+        
 def dev_and_training_evaluation(processor, args, label_list, tokenizer, output_mode, device, global_step, model, num_labels, task_name, tr_loss):
     dataset_evaluation("train", processor, args, label_list, tokenizer, output_mode, device, global_step, model, num_labels, task_name, tr_loss)
     dataset_evaluation("dev", processor, args, label_list, tokenizer, output_mode, device, global_step, model, num_labels, task_name, tr_loss)
@@ -1055,6 +1288,14 @@ def main():
         "emotera": EMOTERAProcessor,
         "fbvaa": FBVAAProcessor,
         "fbvav": FBVAVProcessor,
+        "ssecanger": SSECAngerProcessor,
+        "ssecanticipation": SSECAnticipationProcessor,
+        "ssecdisgust": SSECDisgustProcessor,
+        "ssecfear": SSECFearProcessor,
+        "ssecjoy": SSECJoyProcessor,
+        "ssecsadness": SSECSadnessProcessor,
+        "ssecsurprise": SSECSurpriseProcessor,
+        "ssectrust": SSECTrustProcessor,
     }
 
     output_modes = {
@@ -1077,6 +1318,14 @@ def main():
         "emotera": "classification",
         "fbvaa": "classification",
         "fbvav": "classification",
+        "ssecanger": "classification",
+        "ssecanticipation": "classification",
+        "ssecdisgust": "classification",
+        "ssecfear": "classification",
+        "ssecjoy": "classification",
+        "ssecsadness": "classification",
+        "ssecsurprise": "classification",
+        "ssectrust": "classification",
     }
 
     if args.local_rank == -1 or args.no_cuda:
