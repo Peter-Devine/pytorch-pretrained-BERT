@@ -886,6 +886,33 @@ class SSECTrustProcessor(DataProcessor):
             examples.append(
                 InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
         return examples
+    
+    
+class EmotionStimulusProcessor(DataProcessor):
+
+    def get_train_examples(self, data_dir):
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "train.tsv")), "train")
+
+    def get_dev_examples(self, data_dir):
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "dev.tsv")), "dev")
+
+    def get_labels(self):
+        return ['happy', 'sad', 'surprise', 'disgust', 'anger', 'fear', 'shame']
+
+    def _create_examples(self, lines, set_type):
+        examples = []
+        for (i, line) in enumerate(lines):
+            if i == 0:
+                continue
+            guid = "%s-%s" % (set_type, i)
+            text_a = line[2]
+            text_b = None
+            label = line[1]
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+        return examples
 
     
 def convert_examples_to_features(examples, label_list, max_seq_length,
@@ -1078,6 +1105,8 @@ def compute_metrics(task_name, preds, labels):
     elif task_name == "ssecsurprise":
         return {"acc": simple_accuracy(preds, labels)}
     elif task_name == "ssectrust":
+        return {"acc": simple_accuracy(preds, labels)}
+    elif task_name == "emotionstimulus":
         return {"acc": simple_accuracy(preds, labels)}
     else:
         raise KeyError(task_name)
@@ -1296,6 +1325,7 @@ def main():
         "ssecsadness": SSECSadnessProcessor,
         "ssecsurprise": SSECSurpriseProcessor,
         "ssectrust": SSECTrustProcessor,
+        "emotionstimulus": EmotionStimulusProcessor,
     }
 
     output_modes = {
@@ -1326,6 +1356,7 @@ def main():
         "ssecsadness": "classification",
         "ssecsurprise": "classification",
         "ssectrust": "classification",
+        "emotionstimulus": "classification",
     }
 
     if args.local_rank == -1 or args.no_cuda:
