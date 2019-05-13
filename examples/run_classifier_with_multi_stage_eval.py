@@ -967,6 +967,60 @@ class WASSAProcessor(DataProcessor):
             examples.append(
                 InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
         return examples
+    
+    
+class AffectiveTextEmotionProcessor(DataProcessor):
+
+    def get_train_examples(self, data_dir):
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "train.tsv")), "train")
+
+    def get_dev_examples(self, data_dir):
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "dev.tsv")), "dev")
+
+    def get_labels(self):
+        return ['joy', 'sadness', 'fear', 'surprise', 'anger', 'disgust']
+
+    def _create_examples(self, lines, set_type):
+        examples = []
+        for (i, line) in enumerate(lines):
+            if i == 0:
+                continue
+            guid = "%s-%s" % (set_type, i)
+            text_a = line[2]
+            text_b = None
+            label = line[12]
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+        return examples    
+
+
+class AffectiveTextValenceProcessor(DataProcessor):
+
+    def get_train_examples(self, data_dir):
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "train.tsv")), "train")
+
+    def get_dev_examples(self, data_dir):
+        return self._create_examples(
+            self._read_tsv(os.path.join(data_dir, "dev.tsv")), "dev")
+
+    def get_labels(self):
+        return ['V1', 'V2', 'V3', 'V4', 'V5', 'V6', 'V7']
+
+    def _create_examples(self, lines, set_type):
+        examples = []
+        for (i, line) in enumerate(lines):
+            if i == 0:
+                continue
+            guid = "%s-%s" % (set_type, i)
+            text_a = line[2]
+            text_b = None
+            label = line[13]
+            examples.append(
+                InputExample(guid=guid, text_a=text_a, text_b=text_b, label=label))
+        return examples
 
     
 def convert_examples_to_features(examples, label_list, max_seq_length,
@@ -1165,6 +1219,10 @@ def compute_metrics(task_name, preds, labels):
     elif task_name == "semeval2018task1":
         return {"acc": simple_accuracy(preds, labels)}
     elif task_name == "wassa":
+        return {"acc": simple_accuracy(preds, labels)}
+    elif task_name == "affectivetextemotion":
+        return {"acc": simple_accuracy(preds, labels)}
+    elif task_name == "affectivetextvalence":
         return {"acc": simple_accuracy(preds, labels)}
     else:
         raise KeyError(task_name)
@@ -1386,6 +1444,8 @@ def main():
         "emotionstimulus": EmotionStimulusProcessor,
         "semeval2018task1": SemEval2018Task1Processor,
         "wassa": WASSAProcessor,
+        "affectivetextemotion": AffectiveTextEmotionProcessor,
+        "affectivetextvalence": AffectiveTextValenceProcessor,
     }
 
     output_modes = {
@@ -1419,6 +1479,8 @@ def main():
         "emotionstimulus": "classification",
         "semeval2018task1": "classification",
         "wassa": "classification",
+        "affectivetextemotion": "classification",
+        "affectivetextvalence": "classification",
     }
 
     if args.local_rank == -1 or args.no_cuda:
