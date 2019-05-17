@@ -1228,11 +1228,11 @@ def compute_metrics(task_name, preds, labels):
         raise KeyError(task_name)
         
         
-def dev_and_training_evaluation(processor, args, label_list, tokenizer, output_mode, device, global_step, model, num_labels, task_name, tr_loss):
-    dataset_evaluation("train", processor, args, label_list, tokenizer, output_mode, device, global_step, model, num_labels, task_name, tr_loss)
-    dataset_evaluation("dev", processor, args, label_list, tokenizer, output_mode, device, global_step, model, num_labels, task_name, tr_loss)
+def dev_and_training_evaluation(processor, args, label_list, tokenizer, output_mode, device, global_step, model, num_labels, task_name, tr_loss, epoch_dev_accuracy, best_model):
+    dataset_evaluation("train", processor, args, label_list, tokenizer, output_mode, device, global_step, model, num_labels, task_name, tr_loss, epoch_dev_accuracy, best_model)
+    dataset_evaluation("dev", processor, args, label_list, tokenizer, output_mode, device, global_step, model, num_labels, task_name, tr_loss, epoch_dev_accuracy, best_model)
 
-def dataset_evaluation(eval_type, processor, args, label_list, tokenizer, output_mode, device, global_step, model, num_labels, task_name, tr_loss):
+def dataset_evaluation(eval_type, processor, args, label_list, tokenizer, output_mode, device, global_step, model, num_labels, task_name, tr_loss, epoch_dev_accuracy, best_model):
     if eval_type == "train":
         eval_examples = processor.get_train_examples(args.data_dir)
     else:
@@ -1312,6 +1312,12 @@ def dataset_evaluation(eval_type, processor, args, label_list, tokenizer, output
         for key in sorted(result.keys()):
             logger.info("  %s = %s", key, str(result[key]))
             writer.write("%s = %s\n" % (key, str(result[key])))
+            
+    if eval_type == "dev":
+        # If this is the best performing model out of all epochs, overwrite the best model parameters with those of the current model.
+        if result["acc"] > max(epoch_dev_accuracy):
+            best_model.load_state_dict(model.state_dict())
+        epoch_dev_accuracy.append(result["acc"])
 
 def main():
     parser = argparse.ArgumentParser()
@@ -1547,6 +1553,11 @@ def main():
     model = BertForSequenceClassification.from_pretrained(args.bert_model,
               cache_dir=cache_dir,
               num_labels=num_labels)
+    
+    best_model = BertForSequenceClassification.from_pretrained(args.bert_model,
+              cache_dir=cache_dir,
+              num_labels=num_labels)
+    
     if args.fp16:
         model.half()
     model.to(device)
@@ -1594,6 +1605,7 @@ def main():
     global_step = 0
     nb_tr_steps = 0
     tr_loss = 0
+    epoch_dev_accuracy = [0]
     if args.do_train:
         train_features = convert_examples_to_features(
             train_examples, label_list, args.max_seq_length, tokenizer, output_mode)
@@ -1661,12 +1673,12 @@ def main():
                     global_step += 1
             
             #### EVERY STAGE EVAL #####
-            dev_and_training_evaluation(processor, args, label_list, tokenizer, output_mode, device, global_step, model, num_labels, task_name, tr_loss)
+            dev_and_training_evaluation(processor, args, label_list, tokenizer, output_mode, device, global_step, model, num_labels, task_name, tr_loss, epoch_dev_accuracy, best_model)
             #### EVERY STAGE EVAL END #####
 
     if args.do_train and (args.local_rank == -1 or torch.distributed.get_rank() == 0):
         # Save a trained model, configuration and tokenizer
-        model_to_save = model.module if hasattr(model, 'module') else model  # Only save the model it-self
+        model_to_save = best_model.module if hasattr(best_model, 'module') else best_model  # Only save the model it-self
 
         # If we save using the predefined names, we can load using `from_pretrained`
         output_model_file = os.path.join(args.output_dir, WEIGHTS_NAME)
@@ -1677,11 +1689,11 @@ def main():
         tokenizer.save_vocabulary(args.output_dir)
 
         # Load a trained model and vocabulary that you have fine-tuned
-        model = BertForSequenceClassification.from_pretrained(args.output_dir, num_labels=num_labels)
+        best_model = BertForSequenceClassification.from_pretrained(args.output_dir, num_labels=num_labels)
         tokenizer = BertTokenizer.from_pretrained(args.output_dir, do_lower_case=args.do_lower_case)
     else:
-        model = BertForSequenceClassification.from_pretrained(args.bert_model, num_labels=num_labels)
-    model.to(device)
+        best_model = BertForSequenceClassification.from_pretrained(args.bert_model, num_labels=num_labels)
+    best_model.to(device)
 
     if args.do_eval and (args.local_rank == -1 or torch.distributed.get_rank() == 0):
         eval_examples = processor.get_dev_examples(args.data_dir)
@@ -1704,7 +1716,7 @@ def main():
         eval_sampler = SequentialSampler(eval_data)
         eval_dataloader = DataLoader(eval_data, sampler=eval_sampler, batch_size=args.eval_batch_size)
 
-        model.eval()
+        best_model.eval()
         eval_loss = 0
         nb_eval_steps = 0
         preds = []
@@ -1716,7 +1728,7 @@ def main():
             label_ids = label_ids.to(device)
 
             with torch.no_grad():
-                logits = model(input_ids, segment_ids, input_mask, labels=None)
+                logits = best_model(input_ids, segment_ids, input_mask, labels=None)
 
             # create eval loss and other metric required by the task
             if output_mode == "classification":
@@ -1780,7 +1792,7 @@ def main():
             eval_sampler = SequentialSampler(eval_data)
             eval_dataloader = DataLoader(eval_data, sampler=eval_sampler, batch_size=args.eval_batch_size)
 
-            model.eval()
+            best_model.eval()
             eval_loss = 0
             nb_eval_steps = 0
             preds = []
@@ -1792,7 +1804,7 @@ def main():
                 label_ids = label_ids.to(device)
 
                 with torch.no_grad():
-                    logits = model(input_ids, segment_ids, input_mask, labels=None)
+                    logits = best_model(input_ids, segment_ids, input_mask, labels=None)
             
                 loss_fct = CrossEntropyLoss()
                 tmp_eval_loss = loss_fct(logits.view(-1, num_labels), label_ids.view(-1))
